@@ -4,17 +4,22 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 
+loginParams = {'username': 'admin', 'password': 'admin'}
+loginResult = requests.post("http://192.168.20.51/cgi/login", data=loginParams)
+cookies = dict(name="IDALToken", value=loginResult.cookies.get('IDALToken'))
+
 #url of the page we want to scrape
-url = "https://69b0-188-43-136-33.ngrok.io/1.html"
+url = "http://192.168.20.51/raintime_Expo_Sing_V4/web/web/pages/m9_page9.html"
 #setting chrome_options
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--headless')
 # initiating the webdriver. Parameter includes the path of the webdriver.
 driver = webdriver.Chrome('./chromedriver', options=chrome_options)
 driver.get(url)
+driver.add_cookie(cookies)
 
 # this is just to ensure that the page is loaded
-time.sleep(2)
+time.sleep(3)
 
 html = driver.page_source
 
@@ -23,7 +28,27 @@ html = driver.page_source
 
 # Now, we could simply apply bs4 to html variable
 soup = BeautifulSoup(html, "html.parser")
-data = soup.find(id="abcde").span
-print(data.text)
+temperature01 = soup.find(id="m9_wgt794").span
+humidity01 = soup.find(id="m9_wgt797").span
+temperature02 = soup.find(id="m9_wgt772").span
+humidity02 = soup.find(id="m9_wgt776").span
+temperature03 = soup.find(id="m9_wgt779").span
+humidity03 = soup.find(id="m9_wgt782").span
+windSpeed = soup.find(id="m9_wgt787").span
+solar = soup.find(id="m9_wgt789").span
+UTCI01 = soup.find(id="m9_wgt800").span
+UTCI02 = soup.find(id="m9_wgt803").span
+UTCI03 = soup.find(id="m9_wgt806").span
+print(temperature01.text)
+print(humidity01.text)
+print(temperature02.text)
+print(humidity02.text)
+print((temperature01.text * 1 + temperature02.text * 1) / 2)
+print((humidity01.text * 1 + humidity02.text * 1) / 2)
+print(windSpeed.text)
+print(solar.text)
+print(UTCI01.text)
+print(UTCI02.text)
+print(UTCI03.text)
 
-driver.close() # closing the webdriver
+driver.close()  # closing the webdriver
