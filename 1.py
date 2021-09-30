@@ -4,19 +4,32 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 
-loginParams = {'username': 'admin', 'password': 'admin'}
-loginResult = requests.post("http://192.168.20.51/cgi/login", data=loginParams)
-cookies = dict(name="IDALToken", value=loginResult.cookies.get('IDALToken'))
-
-#url of the page we want to scrape
 url = "http://192.168.20.51/raintime_Expo_Sing_V4/web/web/pages/m9_page9.html"
 #setting chrome_options
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--headless')
+
 # initiating the webdriver. Parameter includes the path of the webdriver.
 driver = webdriver.Chrome('./chromedriver', options=chrome_options)
+driver.get("http://192.168.20.51")
+
+request_cookies_browser = driver.get_cookies()
+
+#making a persistent connection using the requests library
+s = requests.Session()
+params = {'username': 'admin', 'password': 'admin'}
+
+c = [s.cookies.set(c['name'], c['value']) for c in request_cookies_browser]
+
+resp = s.post("http://192.168.20.51/cgi/login", params) #I get a 200 status_code
+
+#passing the cookie of the response to the browser
+dict_resp_cookies = resp.cookies.get_dict()
+response_cookies_browser = [{'name':name, 'value':value} for name, value in dict_resp_cookies.items()]
+c = [driver.add_cookie(c) for c in response_cookies_browser]
+
+#the browser now contains the cookies generated from the authentication
 driver.get(url)
-driver.add_cookie(cookies)
 
 # this is just to ensure that the page is loaded
 time.sleep(3)
@@ -39,16 +52,6 @@ solar = soup.find(id="m9_wgt789").span
 UTCI01 = soup.find(id="m9_wgt800").span
 UTCI02 = soup.find(id="m9_wgt803").span
 UTCI03 = soup.find(id="m9_wgt806").span
-print(temperature01.text)
-print(humidity01.text)
-print(temperature02.text)
-print(humidity02.text)
-print((temperature01.text * 1 + temperature02.text * 1) / 2)
-print((humidity01.text * 1 + humidity02.text * 1) / 2)
-print(windSpeed.text)
-print(solar.text)
-print(UTCI01.text)
-print(UTCI02.text)
-print(UTCI03.text)
+print(temperature01.text, humidity01.text, temperature02.text, humidity02.text, temperature03.text, humidity03.text, windSpeed.text, solar.text, UTCI01.text, UTCI02.text, UTCI03.text)
 
 driver.close()  # closing the webdriver
