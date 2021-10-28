@@ -54,4 +54,8 @@ UTCI02 = soup.find(id="m9_wgt803").span
 UTCI03 = soup.find(id="m9_wgt806").span
 print(temperature01.text, humidity01.text, temperature02.text, humidity02.text, temperature03.text, humidity03.text, windSpeed.text, solar.text, UTCI01.text, UTCI02.text, UTCI03.text)
 
-driver.close()  # closing the webdriver
+# driver.close()  # closing the webdriver.  It closes the the browser window on which the focus is set.
+
+# quit() basically calls driver.dispose method which in turn closes all the browser windows and
+# ends the WebDriver session gracefully.
+driver.quit()
